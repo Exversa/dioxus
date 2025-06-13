@@ -2498,10 +2498,6 @@ impl BuildRequest {
         use std::fs::{create_dir_all, remove_dir_all, write};
         let root = self.root_dir();
 
-        // First clean root dir
-        remove_dir_all(&root)?;
-        create_dir_all(&root)?;
-
         // gradle
         let wrapper = root.join("gradle").join("wrapper");
         create_dir_all(&wrapper)?;
