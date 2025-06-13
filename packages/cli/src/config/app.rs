@@ -34,4 +34,10 @@ pub(crate) struct ApplicationConfig {
     /// `dx` will merge any required settings into this file required to build the app
     #[serde(default)]
     pub(crate) android_manifest: Option<PathBuf>,
+
+    /// Use this folder for any additional overrides for the Android app.
+    /// `dx` will first copy its own files into the target folder, then recursively copy
+    /// this folder over it.
+    #[serde(default)]
+    pub(crate) android_override_dir: Option<PathBuf>,
 }

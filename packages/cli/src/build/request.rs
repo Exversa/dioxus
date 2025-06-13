@@ -2688,6 +2688,30 @@ impl BuildRequest {
             ),
         )?;
 
+        if let Some(override_dir) = self.config.application.android_override_dir.as_deref() {
+            for entry in walkdir::WalkDir::new(self.package_manifest_dir().join(override_dir)) {
+                let entry = entry.context("Failed to read entry in android override dir")?;
+
+                let relative_path = entry
+                    .path()
+                    .strip_prefix(self.package_manifest_dir())
+                    .context("Failed to strip prefix for entry in android override dir")?;
+
+                if entry.file_type().is_dir() {
+                    create_dir_all(root.join(relative_path))?;
+                } else if entry.file_type().is_file() {
+                    let content = std::fs::read(entry.path())
+                        .context("Failed to read file in android override dir")?;
+                    write(root.join(relative_path), content)?;
+                } else {
+                    tracing::warn!(
+                        "Skipping non-file entry in android override dir: {}",
+                        entry.path().display()
+                    );
+                }
+            }
+        }
+
         Ok(())
     }
 

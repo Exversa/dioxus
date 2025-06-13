@@ -21,6 +21,7 @@ impl Default for DioxusConfig {
                 tailwind_output: None,
                 ios_info_plist: None,
                 android_manifest: None,
+                android_override_dir: None,
                 macos_info_plist: None,
                 ios_entitlements: None,
                 macos_entitlements: None,
