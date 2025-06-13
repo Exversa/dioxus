@@ -2495,8 +2495,12 @@ impl BuildRequest {
     /// would be to unpack some zip folder or something stored via `include_dir!()`. However, we do
     /// need to customize the whole setup a bit, so it's just simpler (though messier) to do it this way.
     fn build_android_app_dir(&self) -> Result<()> {
-        use std::fs::{create_dir_all, write};
+        use std::fs::{create_dir_all, remove_dir_all, write};
         let root = self.root_dir();
+
+        // First clean root dir
+        remove_dir_all(&root)?;
+        create_dir_all(&root)?;
 
         // gradle
         let wrapper = root.join("gradle").join("wrapper");
@@ -2689,12 +2693,17 @@ impl BuildRequest {
         )?;
 
         if let Some(override_dir) = self.config.application.android_override_dir.as_deref() {
-            for entry in walkdir::WalkDir::new(self.package_manifest_dir().join(override_dir)) {
+            let full_override_dir = self
+                .package_manifest_dir()
+                .join(override_dir)
+                .canonicalize()
+                .context("Failed to canonicalize android override dir")?;
+            for entry in walkdir::WalkDir::new(&full_override_dir) {
                 let entry = entry.context("Failed to read entry in android override dir")?;
 
                 let relative_path = entry
                     .path()
-                    .strip_prefix(self.package_manifest_dir())
+                    .strip_prefix(&full_override_dir)
                     .context("Failed to strip prefix for entry in android override dir")?;
 
                 if entry.file_type().is_dir() {
