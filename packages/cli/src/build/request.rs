@@ -2495,7 +2495,7 @@ impl BuildRequest {
     /// would be to unpack some zip folder or something stored via `include_dir!()`. However, we do
     /// need to customize the whole setup a bit, so it's just simpler (though messier) to do it this way.
     fn build_android_app_dir(&self) -> Result<()> {
-        use std::fs::{create_dir_all, remove_dir_all, write};
+        use std::fs::{create_dir_all, write};
         let root = self.root_dir();
 
         // gradle
